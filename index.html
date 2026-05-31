@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ffffff">
+<meta name="color-scheme" content="light only">
+<title>Mellis Aufgaben</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=Nunito:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #fdf7f4;
+    --surface2: #faeee6;
+    --warm: #d4693a;
+    --warm-light: #f0c4a8;
+    --warm-deep: #b8501f;
+    --green: #4a9e6a;
+    --green-light: #c2e8cf;
+    --text: #1a1008;
+    --text-soft: #5a3e2e;
+    --text-muted: #9a7e6e;
+    --shadow: rgba(160,80,30,0.10);
+    --radius: 18px;
+    --radius-sm: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { height: 100%; height: -webkit-fill-available; }
+  body {
+    background: #ffffff !important;
+    color-scheme: light;
+    font-family: 'Nunito', sans-serif;
+    color: var(--text);
+    height: 100dvh;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+  .layout { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0; }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 10% 0%, rgba(232,149,106,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 90% 100%, rgba(114,176,135,0.07) 0%, transparent 55%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .app {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-width: 420px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 16px 24px;
+    position: relative;
+    z-index: 1;
+    -webkit-overflow-scrolling: touch;
+  }
+  .header { padding: 52px 0 20px; animation: fadeDown 0.6s ease both; }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+  .greeting { font-family: 'Lora', serif; line-height: 1.15; }
+  .greeting .hey { display: block; font-size: 18px; font-weight: 400; color: var(--warm); letter-spacing: 0.04em; }
+  .greeting .name { display: block; font-size: 36px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+  .subline { font-size: 14px; color: var(--text-soft); margin-top: 6px; font-weight: 500; }
+  .day-mode-card {
+    background: var(--surface);
+    border: 1.5px solid var(--warm-light);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin: 16px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    animation: fadeUp 0.5s ease 0.1s both;
+    box-shadow: 0 2px 12px var(--shadow);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .day-mode-card:hover { transform: translateY(-1px); }
+  .day-mode-card.bad-day { background: #f3ede8; border-color: #d4b8a8; }
+  .day-mode-left { display: flex; align-items: center; gap: 10px; }
+  .day-icon { font-size: 24px; line-height: 1; }
+  .day-label { font-size: 13px; font-weight: 600; color: var(--text); }
+  .day-sub { font-size: 11.5px; color: var(--text-soft); margin-top: 1px; }
+  .toggle-pill { width: 46px; height: 26px; border-radius: 13px; background: var(--warm-light); position: relative; transition: background 0.3s; flex-shrink: 0; }
+  .toggle-pill::after { content: ''; position: absolute; width: 20px; height: 20px; border-radius: 50%; background: white; top: 3px; left: 3px; transition: transform 0.3s; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+  .toggle-pill.active { background: var(--warm); }
+  .toggle-pill.active::after { transform: translateX(20px); }
+  .quote-card {
+    background: linear-gradient(135deg, var(--warm) 0%, var(--warm-deep) 100%);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 20px;
+    color: white;
+    animation: fadeUp 0.5s ease 0.15s both;
+    box-shadow: 0 4px 20px rgba(201,125,80,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .quote-card::before { content: '"'; position: absolute; top: -10px; left: 10px; font-family: 'Lora', serif; font-size: 80px; opacity: 0.15; line-height: 1; }
+  .quote-text { font-family: 'Lora', serif; font-size: 14px; font-style: italic; line-height: 1.6; position: relative; }
+  .section { margin-bottom: 24px; animation: fadeUp 0.5s ease 0.2s both; }
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
+  .task-count { font-size: 11px; color: var(--text-muted); }
+  .task-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    box-shadow: 0 2px 10px var(--shadow);
+    border: 1.5px solid transparent;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .task-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--shadow); border-color: var(--warm-light); }
+  .task-card.done { opacity: 0.55; background: var(--bg); box-shadow: none; }
+  .task-card.done .task-text { text-decoration: line-through; color: var(--text-muted); }
+  @keyframes celebrate { 0% { background: var(--surface); } 30% { background: #e8f5ed; } 100% { background: var(--surface); } }
+  .task-card.celebrating { animation: celebrate 0.8s ease; }
+  .check-circle { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--warm-light); background: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; transition: all 0.3s ease; }
+  .task-card.done .check-circle { background: var(--green); border-color: var(--green); }
+  .check-icon { color: white; font-size: 13px; display: none; }
+  .task-card.done .check-icon { display: block; }
+  .task-content { flex: 1; }
+  .task-text { font-size: 15px; font-weight: 500; line-height: 1.4; color: var(--text); }
+  .done-section { margin-bottom: 24px; animation: fadeUp 0.5s ease 0.3s both; }
+  .done-toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px 0; color: var(--text-muted); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; user-select: none; }
+  .done-toggle svg { transition: transform 0.3s; }
+  .done-toggle.open svg { transform: rotate(90deg); }
+  .add-area {
+    flex-shrink: 0;
+    width: 100%;
+    padding: 10px 16px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
+    background: rgba(255,255,255,0.98);
+    border-top: 1px solid var(--warm-light);
+    z-index: 9999;
+  }
+  .add-bar { max-width: 420px; margin: 0 auto; display: flex; gap: 8px; align-items: center; background: var(--surface); border-radius: 50px; padding: 6px 6px 6px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); border: 1.5px solid var(--warm-light); }
+  .add-input { flex: 1; border: none; outline: none; font-family: 'Nunito', sans-serif; font-size: 14px; color: var(--text); background: transparent; }
+  .add-input::placeholder { color: var(--text-muted); }
+  .add-btn { width: 44px; height: 44px; min-width: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--warm), var(--warm-deep)); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: 300; line-height: 1; flex-shrink: 0; transition: transform 0.2s; box-shadow: 0 3px 12px rgba(180,80,30,0.45); -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  .add-btn:hover { transform: scale(1.08); }
+  .empty-state { text-align: center; padding: 32px 20px; color: var(--text-muted); }
+  .empty-icon { font-size: 36px; margin-bottom: 10px; }
+  .empty-text { font-size: 14px; font-style: italic; font-family: 'Lora', serif; }
+  .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--green); color: white; padding: 10px 20px; border-radius: 50px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 16px rgba(0,0,0,0.15); opacity: 0; transition: all 0.4s ease; pointer-events: none; white-space: nowrap; z-index: 200; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .info-btn { width: 28px; height: 28px; border-radius: 50%; background: var(--surface2); border: 1.5px solid var(--warm-light); color: var(--text-soft); font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: 'Lora', serif; font-style: italic; font-weight: bold; transition: background 0.2s; }
+  .info-btn:hover { background: var(--warm-light); }
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 300; display: none; align-items: flex-end; justify-content: center; }
+  .modal-backdrop.open { display: flex; }
+  .modal { background: var(--surface); border-radius: var(--radius) var(--radius) 0 0; padding: 24px 20px 40px; max-width: 420px; width: 100%; max-height: 80vh; overflow-y: auto; animation: slideUp 0.35s ease; }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-handle { width: 36px; height: 4px; background: var(--warm-light); border-radius: 2px; margin: 0 auto 20px; }
+  .modal-title { font-family: 'Lora', serif; font-size: 18px; margin-bottom: 16px; color: var(--text); }
+  .modal-section { margin-bottom: 16px; }
+  .modal-section h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 6px; }
+  .modal-section p { font-size: 13.5px; color: var(--text-soft); line-height: 1.6; }
+  .modal-close { width: 100%; padding: 12px; background: var(--warm); color: white; border: none; border-radius: var(--radius-sm); font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+  body.bad-day-mode { --bg: #fff2ea; --surface: #ffffff; }
+  .bad-day-banner { background: linear-gradient(135deg, #e8a87c, #c97d50); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 20px; color: white; font-size: 13.5px; line-height: 1.6; display: none; animation: fadeUp 0.4s ease both; }
+  body.bad-day-mode .bad-day-banner { display: block; }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .delete-btn { background: none; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer; padding: 4px; opacity: 0; transition: opacity 0.2s; flex-shrink: 0; }
+  .task-card:hover .delete-btn { opacity: 1; }
+  @media (hover: none) { .delete-btn { opacity: 0.4; } }
+</style>
+</head>
+<body>
+<div class="layout"><div class="app">
+  <div class="header">
+    <div class="header-top">
+      <div class="greeting">
+        <span class="hey">Hey,</span>
+        <span class="name">Melli 🌸</span>
+        <div class="subline" id="subline">Schön, dass du da bist.</div>
+      </div>
+      <button class="info-btn" onclick="openInfo()">i</button>
+    </div>
+  </div>
+  <div class="day-mode-card" id="dayModeCard" onclick="toggleDayMode()">
+    <div class="day-mode-left">
+      <div class="day-icon" id="dayIcon">☀️</div>
+      <div>
+        <div class="day-label" id="dayLabel">Guter Tag</div>
+        <div class="day-sub" id="daySub">Ich schaffe heute was ✨</div>
+      </div>
+    </div>
+    <div class="toggle-pill" id="togglePill"></div>
+  </div>
+  <div class="bad-day-banner">
+    Heute ist ein schwerer Tag – und das ist okay. 💛<br>
+    Du musst nichts perfekt machen. Auch eine einzige kleine Aufgabe ist mehr als genug.
+  </div>
+  <div class="quote-card" id="quoteCard">
+    <div class="quote-text" id="quoteText">Lade...</div>
+  </div>
+  <div class="section" id="openSection">
+    <div class="section-header">
+      <div class="section-title" id="sectionTitle">Meine Aufgaben</div>
+      <div class="task-count" id="taskCount"></div>
+    </div>
+    <div id="taskList"></div>
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="empty-icon">🌿</div>
+      <div class="empty-text">Alles erledigt – oder noch nichts dabei.<br>Füg einfach etwas hinzu, wenn du magst.</div>
+    </div>
+  </div>
+  <div class="done-section">
+    <div class="done-toggle" id="doneToggle" onclick="toggleDone()">
+      <svg width="10" height="14" viewBox="0 0 10 14" fill="none">
+        <path d="M2 2L8 7L2 12" stroke="#b8a898" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>Erledigt</span>
+      <span id="doneCount" style="color:var(--green); font-weight:700"></span>
+    </div>
+    <div id="doneList" style="display:none"></div>
+  </div>
+</div></div>
+<div class="add-area">
+  <div class="add-bar">
+    <input class="add-input" id="addInput" placeholder="Neue Aufgabe hinzufügen …" maxlength="120">
+    <button class="add-btn" onclick="addTask()">+</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal-backdrop" id="infoModal" onclick="closeInfo(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Über diese App 🌸</div>
+    <div class="modal-section">
+      <h4>Was diese App macht</h4>
+      <p>Eine To-Do-App, die für dich da ist – ohne Druck, ohne Stress. Du siehst nur das, was du brauchst.</p>
+    </div>
+    <div class="modal-section">
+      <h4>Schlechter Tag?</h4>
+      <p>Schalte den "Schlechter Tag"-Modus ein – die App zeigt nur 3 Aufgaben und erinnert dich daran, dass eine einzige Aufgabe schon zählt.</p>
+    </div>
+    <div class="modal-section">
+      <h4>Aufgaben hinzufügen</h4>
+      <p>Tippe unten etwas ein und drücke +. Tippe auf eine Aufgabe, um sie abzuhaken.</p>
+    </div>
+    <div class="modal-section">
+      <h4>Was diese App niemals tut</h4>
+      <p>❌ Keine Streaks oder "Du hast X Tage verpasst"<br>
+         ❌ Kein Druck, alles auf einmal zu erledigen<br>
+         ❌ Keine Schuldgefühle<br>
+         ✅ Nur sanfte, liebevolle Begleitung</p>
+    </div>
+    <div class="modal-section">
+      <h4>Version</h4>
+      <p>1.0 – von Team Melli & Marc mit ❤️ gebaut</p>
+    </div>
+    <button class="modal-close" onclick="closeInfoBtn()">Schließen</button>
+  </div>
+</div>
+<script>
+let tasks = JSON.parse(localStorage.getItem('melli_tasks') || '[]');
+let badDay = localStorage.getItem('melli_badday') === 'true';
+let doneOpen = false;
+const goodQuotes = ["Jeder Schritt zählt – auch der kleinste.","Du machst das gut. Wirklich.","Heute ist ein neuer Tag. Kein Druck.","Eine Sache auf einmal reicht vollkommen.","Es ist okay, langsam zu sein.","Du bist mehr als deine To-Do-Liste.","Fortschritt, nicht Perfektion.","Gib dir selbst die Freundlichkeit, die du anderen gibst."];
+const badQuotes = ["Heute reicht es, einfach da zu sein.","Schwere Tage gehören auch dazu. Du schaffst das.","Kein Druck. Atme einfach.","Eine winzige Sache ist genug heute.","Du musst dir keine Beweise erbringen."];
+function getQuote() { const arr = badDay ? badQuotes : goodQuotes; return arr[Math.floor(Math.random() * arr.length)]; }
+function getGreeting() { const h = new Date().getHours(); if (h < 11) return "Guten Morgen"; if (h < 14) return "Guten Mittag"; if (h < 18) return "Guten Nachmittag"; return "Guten Abend"; }
+function save() { localStorage.setItem('melli_tasks', JSON.stringify(tasks)); localStorage.setItem('melli_badday', badDay); }
+function render() {
+  const open = tasks.filter(t => !t.done);
+  const done = tasks.filter(t => t.done);
+  const displayOpen = badDay ? open.slice(0, 3) : open;
+  document.getElementById('sectionTitle').textContent = badDay ? 'Nur das Wichtigste' : 'Meine Aufgaben';
+  const countEl = document.getElementById('taskCount');
+  if (open.length === 0) countEl.textContent = '';
+  else if (badDay && open.length > 3) countEl.textContent = `3 von ${open.length} sichtbar`;
+  else countEl.textContent = `${open.length} offen`;
+  const list = document.getElementById('taskList');
+  const empty = document.getElementById('emptyState');
+  if (displayOpen.length === 0) { list.innerHTML = ''; empty.style.display = 'block'; }
+  else { empty.style.display = 'none'; list.innerHTML = displayOpen.map(t => taskHTML(t)).join(''); }
+  const doneList = document.getElementById('doneList');
+  const doneCount = document.getElementById('doneCount');
+  doneCount.textContent = done.length > 0 ? `(${done.length})` : '';
+  if (doneOpen) doneList.innerHTML = done.map(t => taskHTML(t)).join('');
+}
+function taskHTML(task) {
+  return `<div class="task-card ${task.done ? 'done' : ''}" id="task-${task.id}"><div class="check-circle" onclick="toggleTask('${task.id}')"><span class="check-icon">✓</span></div><div class="task-content" onclick="toggleTask('${task.id}')"><div class="task-text">${escHtml(task.text)}</div></div><button class="delete-btn" onclick="deleteTask('${task.id}')" title="Entfernen">×</button></div>`;
+}
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function addTask() { const input = document.getElementById('addInput'); const text = input.value.trim(); if (!text) return; tasks.unshift({ id: Date.now().toString(), text, done: false, createdAt: Date.now() }); input.value = ''; save(); render(); showToast('Aufgabe hinzugefügt 🌿'); }
+function toggleTask(id) { const task = tasks.find(t => t.id === id); if (!task) return; task.done = !task.done; if (task.done) { const el = document.getElementById('task-' + id); if (el) el.classList.add('celebrating'); setTimeout(() => { save(); render(); showToast(getDoneMessage()); }, 300); } else { save(); render(); } }
+function deleteTask(id) { tasks = tasks.filter(t => t.id !== id); save(); render(); }
+const doneMsgs = ['Geschafft! Du bist toll. ✨','Super gemacht! 🌸','Haken dran – du rockst! 💛','Eine Sache weniger. Gut gemacht!','Stolz auf dich. ✓'];
+function getDoneMessage() { return doneMsgs[Math.floor(Math.random() * doneMsgs.length)]; }
+function toggleDayMode() { badDay = !badDay; applyDayMode(); save(); render(); document.getElementById('quoteText').textContent = getQuote(); }
+function applyDayMode() {
+  const pill = document.getElementById('togglePill');
+  const label = document.getElementById('dayLabel');
+  const sub = document.getElementById('daySub');
+  const icon = document.getElementById('dayIcon');
+  const card = document.getElementById('dayModeCard');
+  if (badDay) { pill.classList.add('active'); label.textContent = 'Schwerer Tag'; sub.textContent = 'Nur das Nötigste heute.'; icon.textContent = '🌧️'; card.classList.add('bad-day'); document.body.classList.add('bad-day-mode'); }
+  else { pill.classList.remove('active'); label.textContent = 'Guter Tag'; sub.textContent = 'Ich schaffe heute was ✨'; icon.textContent = '☀️'; card.classList.remove('bad-day'); document.body.classList.remove('bad-day-mode'); }
+}
+function toggleDone() { doneOpen = !doneOpen; document.getElementById('doneToggle').classList.toggle('open', doneOpen); document.getElementById('doneList').style.display = doneOpen ? 'block' : 'none'; render(); }
+let toastTimer;
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2400); }
+function openInfo() { document.getElementById('infoModal').classList.add('open'); }
+function closeInfo(e) { if (e.target === document.getElementById('infoModal')) closeInfoBtn(); }
+function closeInfoBtn() { document.getElementById('infoModal').classList.remove('open'); }
+document.getElementById('addInput').addEventListener('keydown', e => { if (e.key === 'Enter') addTask(); });
+document.getElementById('subline').textContent = getGreeting() + ', schön dass du da bist.';
+document.getElementById('quoteText').textContent = getQuote();
+applyDayMode();
+render();
+</script>
+</body>
+</html>
