@@ -1,6 +1,6 @@
 {
-  "name": "Mellis Aufgaben",
-  "short_name": "Mellis",
+  "name": "Meine Schritte",
+  "short_name": "Meine Schritte",
   "description": "Eine sanfte To-Do-App – ohne Druck, ohne Stress.",
   "start_url": "./",
   "scope": "./",

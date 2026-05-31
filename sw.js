@@ -2,7 +2,7 @@
 // Notwendig, damit Chrome die Installation als App anbietet (braucht einen
 // fetch-Handler). Strategie: network-first für frische Inhalte, Cache als
 // Offline-Fallback. Bei jeder inhaltlichen Änderung CACHE-Version erhöhen.
-const CACHE = "melli-todo-v1";
+const CACHE = "melli-todo-v2";
 const ASSETS = [
   "./",
   "./index.html",
