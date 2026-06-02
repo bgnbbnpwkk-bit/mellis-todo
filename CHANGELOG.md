@@ -3,6 +3,26 @@
 Alle nennenswerten Änderungen an „Meine Schritte" (Mellis Aufgaben-App).
 Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/).
 
+## [1.2] – 2026-06-02
+
+### Hinzugefügt
+- **Google-Login (Firebase Authentication):** Die App ist nur nach Anmeldung
+  zugänglich. Login-Screen mit „Mit Google anmelden"-Button.
+- **Zugangsbeschränkung:** Nur die freigeschalteten Konten von Marc & Melli
+  dürfen die App nutzen; andere Konten werden nach dem Login sofort wieder
+  abgemeldet (freundliche Meldung auf Deutsch).
+- **Abmelden** im i-Panel, inkl. Anzeige des angemeldeten Kontos.
+- **i-Panel erweitert:** Features, Tech-Stack und Changelog im App-Code.
+- **Auto-Update:** Service Worker übernimmt neue Versionen automatisch
+  (`skipWaiting`/`clients.claim` + Reload bei `controllerchange`) – kein
+  manuelles Neu-Installieren mehr.
+- **GitHub Actions Deploy** auf GitHub Pages (Source = GitHub Actions).
+- `manifest.json` (ersetzt `manifest.webmanifest`).
+
+### Geändert
+- Viewport gegen versehentliches Zoomen/Verschieben gesperrt
+  (`maximum-scale=1, user-scalable=no`); optimiert für iPhone 16e & S24 Ultra.
+
 ## [1.1] – 2026-05-31
 
 ### Hinzugefügt

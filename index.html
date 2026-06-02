@@ -2,12 +2,13 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Meine Schritte">
 <meta name="theme-color" content="#d4693a">
 <meta name="color-scheme" content="light only">
-<link rel="manifest" href="./manifest.webmanifest">
+<link rel="manifest" href="./manifest.json">
 <link rel="apple-touch-icon" href="./icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
 <title>Mellis Aufgaben</title>
@@ -193,10 +194,52 @@
   .delete-btn { background: none; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer; padding: 4px; opacity: 0; transition: opacity 0.2s; flex-shrink: 0; }
   .task-card:hover .delete-btn { opacity: 1; }
   @media (hover: none) { .delete-btn { opacity: 0.4; } }
+  /* --- Login-Screen --- */
+  .auth-screen {
+    position: fixed; inset: 0; z-index: 10000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 32px 28px;
+    padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(232,149,106,0.18) 0%, transparent 60%),
+      linear-gradient(160deg, #fff 0%, #fdf7f4 100%);
+  }
+  .auth-flower { font-size: 64px; margin-bottom: 18px; animation: fadeDown 0.6s ease both; }
+  .auth-title { font-family: 'Lora', serif; font-size: 30px; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+  .auth-sub { font-size: 15px; color: var(--text-soft); line-height: 1.55; max-width: 300px; margin-bottom: 32px; }
+  .google-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 12px;
+    background: #fff; color: #3c4043; border: 1.5px solid var(--warm-light);
+    border-radius: 50px; padding: 14px 26px; font-family: 'Nunito', sans-serif;
+    font-size: 16px; font-weight: 600; cursor: pointer; box-shadow: 0 3px 14px var(--shadow);
+    transition: transform 0.15s ease, box-shadow 0.15s ease; -webkit-tap-highlight-color: transparent;
+  }
+  .google-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px var(--shadow); }
+  .google-btn:disabled { opacity: 0.6; cursor: default; }
+  .google-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+  .auth-error { color: var(--warm-deep); font-size: 14px; line-height: 1.5; margin-top: 20px; max-width: 320px; min-height: 20px; font-weight: 600; }
+  .auth-footer { position: absolute; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); font-size: 12px; color: var(--text-muted); }
+  .auth-hidden { display: none !important; }
+  /* --- Logout im i-Panel --- */
+  .logout-btn { width: 100%; padding: 12px; background: transparent; color: var(--warm-deep); border: 1.5px solid var(--warm-light); border-radius: var(--radius-sm); font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+  .logout-btn:hover { background: var(--surface2); }
+  .account-line { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 </style>
 </head>
 <body>
-<div class="layout"><div class="app">
+<!-- Login-Screen: standardmäßig sichtbar, App bleibt bis zum Login verborgen -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-flower">🌸</div>
+  <div class="auth-title">Meine Schritte</div>
+  <div class="auth-sub">Schön, dass du da bist. Melde dich an, um deine Aufgaben zu sehen.</div>
+  <button class="google-btn" id="googleBtn" onclick="signInWithGoogle()">
+    <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+    Mit Google anmelden
+  </button>
+  <div class="auth-error" id="authError"></div>
+  <div class="auth-footer">von Team Melli &amp; Marc mit ❤️</div>
+</div>
+<div class="layout auth-hidden" id="appLayout"><div class="app">
   <div class="header">
     <div class="header-top">
       <div class="greeting">
@@ -278,15 +321,32 @@
     </div>
     <div class="modal-section">
       <h4>Was ist neu</h4>
-      <p><strong>1.1</strong><br>
+      <p><strong>1.2</strong><br>
+         🔒 Sicherer Zugang per Google-Login – nur für euch beide<br>
+         🔄 Updates kommen jetzt von selbst – kein Neu-Installieren mehr<br>
+         📱 Optimiert für iPhone 16e &amp; Samsung S24 Ultra<br><br>
+         <strong>1.1</strong><br>
          🌸 Als App installierbar – direkt auf dem Startbildschirm<br>
-         ⌨️ Eingabezeile bleibt jetzt über der Tastatur (iPhone &amp; Android)<br>
+         ⌨️ Eingabezeile bleibt über der Tastatur (iPhone &amp; Android)<br>
          📜 Scrollen läuft rund, nichts wird mehr abgeschnitten<br>
          💛 Heißt jetzt „Meine Schritte"</p>
     </div>
     <div class="modal-section">
+      <h4>Technik dahinter</h4>
+      <p>Reines HTML, CSS &amp; JavaScript – ohne schwere Frameworks.<br>
+         Google-Login über Firebase Authentication.<br>
+         Installierbar als PWA mit Service Worker (Auto-Update).<br>
+         Aufgaben werden lokal auf dem Gerät gespeichert.<br>
+         Gehostet auf GitHub Pages, automatisch per GitHub Actions.</p>
+    </div>
+    <div class="modal-section">
       <h4>Version</h4>
-      <p>1.1 – von Team Melli &amp; Marc mit ❤️ gebaut</p>
+      <p>1.2 – von Team Melli &amp; Marc mit ❤️ gebaut</p>
+    </div>
+    <div class="modal-section">
+      <h4>Angemeldet</h4>
+      <p class="account-line" id="accountLine">–</p>
+      <button class="logout-btn" onclick="signOutUser()">Abmelden</button>
     </div>
     <button class="modal-close" onclick="closeInfoBtn()">Schließen</button>
   </div>
@@ -371,12 +431,119 @@ render();
   update();
 })();
 
-// Service Worker registrieren – Voraussetzung für "Als App installieren".
+// Service Worker registrieren – mit Auto-Update (kein manuelles Neu-Installieren).
+// Sobald ein neuer Service Worker die Kontrolle übernimmt, lädt die Seite einmal
+// automatisch neu, damit die frische Version sofort aktiv ist.
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
+    navigator.serviceWorker.register('./sw.js').then((reg) => {
+      // Beim Start und danach regelmäßig auf Updates prüfen.
+      reg.update();
+      setInterval(() => reg.update(), 60 * 60 * 1000);
+    }).catch(() => {});
+  });
+  let reloadingForSW = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (reloadingForSW) return;
+    reloadingForSW = true;
+    window.location.reload();
   });
 }
+</script>
+<script type="module">
+// --- Firebase Authentication (Google) ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect,
+  getRedirectResult, onAuthStateChanged, signOut, setPersistence,
+  browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBZbh9UjXGbTTPIO_jewU41sTKYe4pHvNY",
+  authDomain: "unser-einkaufszettel.firebaseapp.com",
+  databaseURL: "https://unser-einkaufszettel-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "unser-einkaufszettel",
+  storageBucket: "unser-einkaufszettel.firebasestorage.app",
+  messagingSenderId: "1091522338551",
+  appId: "1:1091522338551:web:20bbe0ed444691eebcbdf2"
+};
+
+// Nur diese Google-Konten dürfen die App nutzen.
+const ALLOWED_EMAILS = [
+  "marc.saenger1975@gmail.com",
+  "melaniechabane1975@gmail.com"
+];
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+provider.setCustomParameters({ prompt: "select_account" });
+
+const authScreen = document.getElementById("authScreen");
+const appLayout = document.getElementById("appLayout");
+const googleBtn = document.getElementById("googleBtn");
+const authError = document.getElementById("authError");
+
+function showError(msg) { authError.textContent = msg || ""; }
+
+// Anmeldung: Popup, mit Redirect als Fallback (z.B. iOS-Standalone/PWA).
+async function signInWithGoogle() {
+  showError("");
+  googleBtn.disabled = true;
+  try {
+    await signInWithPopup(auth, provider);
+  } catch (err) {
+    if (err && (err.code === "auth/popup-blocked" ||
+                err.code === "auth/cancelled-popup-request" ||
+                err.code === "auth/operation-not-supported-in-this-environment")) {
+      try { await signInWithRedirect(auth, provider); return; } catch (e2) { /* unten behandeln */ }
+    }
+    if (err && err.code === "auth/popup-closed-by-user") {
+      showError("");
+    } else {
+      showError("Anmeldung fehlgeschlagen. Bitte versuch es noch einmal.");
+    }
+    googleBtn.disabled = false;
+  }
+}
+
+async function signOutUser() {
+  try { await signOut(auth); } catch (e) { /* ignorieren */ }
+}
+
+window.signInWithGoogle = signInWithGoogle;
+window.signOutUser = signOutUser;
+
+setPersistence(auth, browserLocalPersistence).catch(() => {});
+// Ergebnis eines etwaigen Redirect-Logins einsammeln.
+getRedirectResult(auth).catch(() => {});
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    appLayout.classList.add("auth-hidden");
+    authScreen.classList.remove("auth-hidden");
+    googleBtn.disabled = false;
+    return;
+  }
+  const email = (user.email || "").toLowerCase();
+  if (!ALLOWED_EMAILS.includes(email)) {
+    // Nicht freigeschalteter Account: sofort abmelden + freundliche Meldung.
+    showError("Schön, dass du da bist 🌸 – aber diese App ist privat für Melli & Marc. "
+            + "Mit diesem Konto kommst du leider nicht rein.");
+    appLayout.classList.add("auth-hidden");
+    authScreen.classList.remove("auth-hidden");
+    signOut(auth).catch(() => {});
+    googleBtn.disabled = false;
+    return;
+  }
+  // Freigeschaltet: App zeigen.
+  showError("");
+  authScreen.classList.add("auth-hidden");
+  appLayout.classList.remove("auth-hidden");
+  const acc = document.getElementById("accountLine");
+  if (acc) acc.textContent = user.email;
+});
 </script>
 </body>
 </html>

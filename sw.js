@@ -1,12 +1,13 @@
-// Service Worker für "Mellis Aufgaben".
-// Notwendig, damit Chrome die Installation als App anbietet (braucht einen
-// fetch-Handler). Strategie: network-first für frische Inhalte, Cache als
-// Offline-Fallback. Bei jeder inhaltlichen Änderung CACHE-Version erhöhen.
-const CACHE = "melli-todo-v3";
+// Service Worker für "Meine Schritte".
+// Strategie: network-first für frische Inhalte, Cache als Offline-Fallback.
+// Auto-Update: skipWaiting + clients.claim sorgen dafür, dass eine neue Version
+// sofort übernimmt; die Seite lädt dann via 'controllerchange' automatisch neu.
+// Bei jeder inhaltlichen Änderung CACHE-Version erhöhen.
+const CACHE = "melli-todo-v4";
 const ASSETS = [
   "./",
   "./index.html",
-  "./manifest.webmanifest",
+  "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
 ];
@@ -28,6 +29,11 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const req = e.request;
   if (req.method !== "GET") return;
+  const url = new URL(req.url);
+  // Firebase-/Google-Auth-Anfragen niemals abfangen/cachen.
+  if (/(googleapis|gstatic|firebaseapp|google\.com|firebaseio)/.test(url.hostname)) return;
+  // Nur gleiche Herkunft cachen; alles andere unverändert durchreichen.
+  if (url.origin !== self.location.origin) return;
   e.respondWith(
     fetch(req)
       .then((res) => {
